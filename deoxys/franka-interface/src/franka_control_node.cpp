@@ -501,7 +501,12 @@ int main(int argc, char **argv) {
             traj_interpolator_type = control_command.traj_interpolator_type;
           }
 
+          std::cout << "ParseMessage(control_msg);" << std::endl;
+
           global_handler->controller_ptr->ParseMessage(control_msg);
+
+
+          std::cout << "ComputeGoal" << std::endl;
 
           global_handler->controller_ptr->ComputeGoal(current_state_info,
                                                       goal_state_info);
@@ -590,6 +595,14 @@ int main(int argc, char **argv) {
               global_handler, state_publisher, model, current_state_info,
               goal_state_info, policy_rate, traj_rate));
         }
+      else if (controller_type == ControllerType::JOINT_VELOCITY) {
+          // Cartesian Velocity control callback
+          global_handler->logger->info("Cartesian velocity callback");
+          robot.control(control_callbacks::CreateJointVelocitiesCallback(
+              global_handler, state_publisher, model, current_state_info,
+              goal_state_info, policy_rate, traj_rate));
+        }
+      
       }
       global_handler->time = 0.0;
     }

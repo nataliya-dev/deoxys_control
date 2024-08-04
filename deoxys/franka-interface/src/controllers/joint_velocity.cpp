@@ -34,8 +34,11 @@ JointVelocityController::JointVelocityController(franka::Model &model) {
 }
 
 bool JointVelocityController::ParseMessage(const FrankaControlMessage &msg) {
+    std::cout << "Parse msg" << std::endl;
+
 
   if (!msg.control_msg().UnpackTo(&control_msg_)) {
+    std::cout << "!msg.control_msg().UnpackTo(&control_msg_)" << std::endl;
     return false;
   }
 
@@ -97,6 +100,7 @@ JointVelocityController::Step(const franka::RobotState &robot_state,
 
   std::chrono::high_resolution_clock::time_point t1 =
       std::chrono::high_resolution_clock::now();
+  std::cout << "STEP" << std::endl;
 
   Eigen::Matrix<double, 7, 1> current_q, current_dq;
 
