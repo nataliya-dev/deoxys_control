@@ -84,6 +84,7 @@ if (BUILD_FRANKA)
     franka-interface/src/controllers/joint_position.cpp
     franka-interface/src/controllers/joint_impedance.cpp
     franka-interface/src/controllers/cartesian_velocity.cpp
+    franka-interface/src/controllers/joint_velocity.cpp
     )
   
   add_library(shared_utils

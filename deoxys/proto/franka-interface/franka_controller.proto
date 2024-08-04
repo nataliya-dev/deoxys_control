@@ -120,6 +120,8 @@ message FrankaJointVelocityControllerMessage {
   JointGoal goal = 1;
   double kp_gains = 2;
   double kd_gains = 3;
+  repeated double kp = 4;
+  repeated double kd = 5;
 }
 
 // TODO(Yifeng) Placeholder for now

@@ -479,6 +479,40 @@ class FrankaInterface:
             msg_str = control_msg.SerializeToString()
             self._publisher.send(msg_str)
 
+        elif controller_type == "JOINT_VELOCITY":
+
+            assert controller_cfg is not None
+            assert len(action) == 7 + 1
+
+            joint_velocity_msg = (
+                franka_controller_pb2.FrankaJointVelocityControllerMessage()
+            )
+            goal = action_to_joint_pos_goal(action, is_delta=controller_cfg.is_delta)
+
+            joint_velocity_msg.goal.CopyFrom(goal)
+
+            joint_velocity_msg.kp[:] = controller_cfg.joint_kp
+            joint_velocity_msg.kd[:] = controller_cfg.joint_kd
+
+            control_msg = franka_controller_pb2.FrankaControlMessage()
+            control_msg.controller_type = (
+                franka_controller_pb2.FrankaControlMessage.ControllerType.JOINT_VELOCITY
+            )
+            control_msg.traj_interpolator_type = TRAJ_INTERPOLATOR_MAPPING[
+                controller_cfg.traj_interpolator_cfg.traj_interpolator_type
+            ]
+            control_msg.traj_interpolator_time_fraction = (
+                controller_cfg.traj_interpolator_cfg["time_fraction"]
+            )
+            control_msg.control_msg.Pack(joint_velocity_msg)
+            control_msg.timeout = 0.2
+            control_msg.termination = termination
+
+            control_msg.state_estimator_msg.CopyFrom(state_estimator_msg)
+
+            msg_str = control_msg.SerializeToString()
+            self._publisher.send(msg_str)
+
         if self.has_gripper:
             self.gripper_control(action[self.last_gripper_dim])
 

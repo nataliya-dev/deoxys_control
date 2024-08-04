@@ -26,6 +26,7 @@
 #include "utils/control_callbacks/joint_pos_callback.h"
 #include "utils/control_callbacks/torque_callback.h"
 #include "utils/control_callbacks/cartesian_velocity_calllback.h"
+#include "utils/control_callbacks/joint_velocity_callback.h"
 
 // Interpolators
 #include "utils/traj_interpolators/linear_joint_position_traj_interpolator.h"
@@ -47,6 +48,7 @@
 #include "controllers/osc_position_impedance.h"
 #include "controllers/osc_yaw_impedance.h"
 #include "controllers/cartesian_velocity.h"
+#include "controllers/joint_velocity.h"
 
 #include "franka_controller.pb.h"
 #include "franka_robot_state.pb.h"
@@ -417,6 +419,14 @@ int main(int argc, char **argv) {
             global_handler->controller_ptr =
                 std::make_shared<controller::CartesianVelocityController>(model);
             global_handler->logger->info("Initialize Cartesian Velocity");
+            global_handler->running = true;            
+          } 
+          else if (control_command.controller_type ==
+                         ControllerType::JOINT_VELOCITY &&
+                     controller_type == ControllerType::NO_CONTROL) {
+            global_handler->controller_ptr =
+                std::make_shared<controller::JointVelocityController>(model);
+            global_handler->logger->info("Initialize Joint Velocity");
             global_handler->running = true;            
           } else if (control_command.controller_type ==
                          ControllerType::NO_CONTROL ||
