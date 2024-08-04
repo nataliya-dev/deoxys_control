@@ -3,7 +3,7 @@ controller_type: JOINT_POSITION
 is_delta: false
 
 traj_interpolator_cfg:
-  traj_interpolator_type: SMOOTH_JOINT_POSITION
+  traj_interpolator_type: LINEAR_JOINT_POSITION
   time_fraction: 0.3
 
 state_estimator_cfg:

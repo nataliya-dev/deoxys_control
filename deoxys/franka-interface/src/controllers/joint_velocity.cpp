@@ -1,29 +1,27 @@
 // Copyright 2022 Yifeng Zhu
 
-#include "franka_controller.pb.h"
-#include "franka_robot_state.pb.h"
-#include <atomic>
-#include <chrono>
-#include <iostream>
-#include <string>
-#include <thread>
-
-#include <Eigen/Dense>
-#include <yaml-cpp/yaml.h>
+#include "controllers/joint_velocity.h"
 
 #include <franka/duration.h>
 #include <franka/exception.h>
 #include <franka/model.h>
 #include <franka/rate_limiting.h>
 #include <franka/robot.h>
+#include <yaml-cpp/yaml.h>
 
+#include <Eigen/Dense>
+#include <atomic>
+#include <chrono>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <thread>
+
+#include "franka_controller.pb.h"
+#include "franka_robot_state.pb.h"
 #include "utils/common_utils.h"
 #include "utils/control_utils.h"
 #include "utils/robot_utils.h"
-
-#include "controllers/joint_velocity.h"
-
-#include <memory>
 
 namespace controller {
 JointVelocityController::JointVelocityController() {}
@@ -90,59 +88,11 @@ void JointVelocityController::ComputeGoal(
   // control_msg_.goal().q6(), control_msg_.goal().q7();
 }
 
-std::array<double, 7>
-JointVelocityController::Step(const franka::RobotState &robot_state,
-                               const Eigen::Matrix<double, 7, 1> &desired_q) {
-
-  std::chrono::high_resolution_clock::time_point t1 =
-      std::chrono::high_resolution_clock::now();
-
-  Eigen::Matrix<double, 7, 1> current_q, current_dq;
-
-  current_q = this->state_estimator_ptr_->GetCurrentJointPos();
-  current_dq = this->state_estimator_ptr_->GetCurrentJointVel();
-
-  Eigen::MatrixXd joint_pos_error(7, 1);
-  joint_pos_error << desired_q - current_q;
-
-  Eigen::Matrix<double, 7, 1> desired_qv = desired_q - current_q;
-
-  //double kv = 2.0;i
-  //desired_qv *=kv;
-
-  std:: cout << "desired_qv\n" << desired_qv << std::endl;
-  
-  for (int i = 0; i < 7; i++) {
-    if (desired_qv[i] < velocity_min_[i]){
-      desired_qv[i] = velocity_min_[i];
-    }
-
-    if (desired_qv[i] > velocity_max_[i]){
-      desired_qv[i] = velocity_max_[i];
-    }
-  }
-  //std:: cout << "v max desired_qv\n" << desired_qv << std::endl;
-
-
-  //Eigen::Matrix<double, 7, 1> dist2joint_max;
-  //Eigen::Matrix<double, 7, 1> dist2joint_min;
-
-  //dist2joint_max = joint_max_.matrix() - current_q;
-  //dist2joint_min = current_q - joint_min_.matrix();
-
-  //for (int i = 0; i < 7; i++) {
-  //  if (dist2joint_max[i] < 0.1 && desired_qv[i] > 0.0)
-  //    desired_qv[i] = 0.0;
-  //  if (dist2joint_min[i] < 0.1 && desired_qv[i] < 0.0)
-  //    desired_qv[i] = 0.0;
-  //}
-
-  std:: cout << "d max desired_qv\n" << desired_qv << std::endl;
-
-
+std::array<double, 7> JointVelocityController::Step(
+    const franka::RobotState &robot_state,
+    const Eigen::Matrix<double, 7, 1> &desired_q) {
   std::array<double, 7> qv_d_array{};
-  Eigen::VectorXd::Map(&qv_d_array[0], 7) = desired_qv;
+  Eigen::VectorXd::Map(&qv_d_array[0], 7) = desired_q;
   return qv_d_array;
-
 }
-} // namespace controller
+}  // namespace controller

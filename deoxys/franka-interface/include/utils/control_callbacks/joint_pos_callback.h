@@ -1,8 +1,9 @@
 // Copyright 2022 Yifeng Zhu
 
-#include <chrono>
 #include <franka/model.h>
 #include <franka/robot.h>
+
+#include <chrono>
 
 #include "utils/control_utils.h"
 #include "utils/robot_utils.h"
@@ -52,43 +53,23 @@ CreateJointPositionCallback(
           global_handler->traj_interpolator_time_fraction);
     }
 
-  
-    Eigen::Matrix<double, 7, 1> diff = goal_state_info->joint_positions - current_state_info->joint_positions;
-    Eigen::Matrix<double, 7, 1> direction = diff.array().sign();
+    global_handler->time += period.toSec();
+    Eigen::Matrix<double, 7, 1> desired_q;
 
-    double delta = 0.000008;
-    Eigen::Matrix<double, 7, 1> desired_q = current_state_info->joint_positions + direction * delta;
-	Eigen::Matrix<double, 7, 1> goal = goal_state_info->joint_positions;
-    // Ensure q_desired does not exceed goal positions
-    for (int i = 0; i < 7; ++i) {
-        if ((direction(i) > 0 && desired_q(i) > goal(i)) || (direction(i) < 0 && desired_q(i) < goal(i))) {
-            desired_q(i) = goal(i);
-        }
-    }
-  
-  
-    //std::cout << "goal_state_info->joint_positions\n" << goal_state_info->joint_positions << std::endl;
-    //global_handler->time += period.toSec();
-    //Eigen::Matrix<double, 7, 1> diff = (goal_state_info->joint_positions - current_state_info->joint_positions);
-    //std::cout << "diff\n" << diff << std::endl;
-    //Eigen::Matrix<double, 7, 1> desired_q = diff*0.0001+current_state_info->joint_positions;
-    //std::cout << "desired_q\n" << desired_q << std::endl;
-    //std::cout << "curr q\n" << current_state_info->joint_positions << std::endl;
-    std::cout << "com inc\n" << desired_q - current_state_info->joint_positions << std::endl;
+    std::cout << "current_state_info->joint_positions\n"
+              << current_state_info->joint_positions.transpose() << std::endl;
+    std::cout << "goal_state_info->joint_positions\n"
+              << goal_state_info->joint_positions.transpose() << std::endl;
 
-   
-
-//    global_handler->traj_interpolator_ptr->GetNextStep(global_handler->time,
-//                                                       desired_q);
-
-//    std::cout << "interp q \n" << desired_q  << std::endl;
-//    std::cout << "interp com inc\n" << desired_q - current_state_info->joint_positions << std::endl;
+    global_handler->traj_interpolator_ptr->GetNextStep(global_handler->time,
+                                                       desired_q);
 
     state_publisher->UpdateNewState(robot_state, &model);
 
     std::array<double, 7> joint_positions;
     joint_positions =
         global_handler->controller_ptr->Step(robot_state, desired_q);
+
     // TODO: Regularize delta q d
     // std::cout << "Desired: " << desired_q.transpose() << std::endl;
     // std::cout << " Current : " << current_joint_positions.transpose() <<
@@ -103,6 +84,6 @@ CreateJointPositionCallback(
   };
 }
 
-} // NAMESPACE control_callbacks
+}  // NAMESPACE control_callbacks
 
-#endif // UTILS_CONTROL_CALLBACKS_JOINT_POS_CALLBACK_H_
+#endif  // UTILS_CONTROL_CALLBACKS_JOINT_POS_CALLBACK_H_
