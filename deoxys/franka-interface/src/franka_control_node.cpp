@@ -607,6 +607,7 @@ int main(int argc, char **argv) {
   } catch (franka::Exception const &e) {
     auto logger = log_utils::get_logger(
         config["ARM_LOGGER"]["CONSOLE"]["LOGGER_NAME"].as<std::string>());
+    std::cout << e.what() << std::endl;
     logger->error(e.what());
     return -1;
   }

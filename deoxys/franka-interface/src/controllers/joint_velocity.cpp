@@ -107,8 +107,8 @@ JointVelocityController::Step(const franka::RobotState &robot_state,
 
   Eigen::Matrix<double, 7, 1> desired_qv = desired_q - current_q;
 
-  double kv = 2.0;
-  desired_qv *=kv;
+  //double kv = 2.0;i
+  //desired_qv *=kv;
 
   std:: cout << "desired_qv\n" << desired_qv << std::endl;
   
@@ -121,21 +121,21 @@ JointVelocityController::Step(const franka::RobotState &robot_state,
       desired_qv[i] = velocity_max_[i];
     }
   }
-  std:: cout << "v max desired_qv\n" << desired_qv << std::endl;
+  //std:: cout << "v max desired_qv\n" << desired_qv << std::endl;
 
 
-  Eigen::Matrix<double, 7, 1> dist2joint_max;
-  Eigen::Matrix<double, 7, 1> dist2joint_min;
+  //Eigen::Matrix<double, 7, 1> dist2joint_max;
+  //Eigen::Matrix<double, 7, 1> dist2joint_min;
 
-  dist2joint_max = joint_max_.matrix() - current_q;
-  dist2joint_min = current_q - joint_min_.matrix();
+  //dist2joint_max = joint_max_.matrix() - current_q;
+  //dist2joint_min = current_q - joint_min_.matrix();
 
-  for (int i = 0; i < 7; i++) {
-    if (dist2joint_max[i] < 0.1 && desired_qv[i] > 0.0)
-      desired_qv[i] = 0.0;
-    if (dist2joint_min[i] < 0.1 && desired_qv[i] < 0.0)
-      desired_qv[i] = 0.0;
-  }
+  //for (int i = 0; i < 7; i++) {
+  //  if (dist2joint_max[i] < 0.1 && desired_qv[i] > 0.0)
+  //    desired_qv[i] = 0.0;
+  //  if (dist2joint_min[i] < 0.1 && desired_qv[i] < 0.0)
+  //    desired_qv[i] = 0.0;
+  //}
 
   std:: cout << "d max desired_qv\n" << desired_qv << std::endl;
 

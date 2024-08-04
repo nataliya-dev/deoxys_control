@@ -58,14 +58,25 @@ namespace control_callbacks {
                 global_handler->traj_interpolator_ptr->GetNextStep(global_handler->time,
                                                        desired_q);
 
-                state_publisher->UpdateNewState(robot_state, &model);
+		Eigen::Matrix<double, 7, 1> traj_inc = desired_q - current_state_info->joint_positions; 
+		std::cout << "traj_inc\n" << traj_inc << std::endl;
+		state_publisher->UpdateNewState(robot_state, &model);
+	
 
-                std::array<double, 7> joint_velocities;
-                joint_velocities =
-                    global_handler->controller_ptr->Step(robot_state, desired_q);
+	        Eigen::Matrix<double, 7, 1> diff = goal_state_info->joint_positions - current_state_info->joint_positions;
+    		Eigen::Matrix<double, 7, 1> direction = diff.array().sign();
+
+    	        double delta = 0.001;
+    		Eigen::Matrix<double, 7, 1> desired_qv =  direction * delta;
+
+		 std::array<double, 7> qv_d_array{};
+  		 Eigen::VectorXd::Map(&qv_d_array[0], 7) = desired_qv;
+                //std::array<double, 7> joint_velocities;
+                //joint_velocities =
+                //    global_handler->controller_ptr->Step(robot_state, desired_q);
                 
-
-                franka::JointVelocities output(joint_velocities);
+		std::cout << "qv\n" << desired_qv.transpose() << std::endl;
+                franka::JointVelocities output(qv_d_array);
 
                 std::chrono::high_resolution_clock::time_point t2 =
                     std::chrono::high_resolution_clock::now();
