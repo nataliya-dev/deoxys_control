@@ -27,7 +27,6 @@ namespace control_callbacks {
             return [&global_handler, &state_publisher, &model, &current_state_info, &goal_state_info, &policy_rate, &traj_rate](const franka::RobotState &robot_state,
             franka::Duration period) -> franka::JointVelocities {
 
-                std::cout << "CreateJointVelocitiesCallback" << std::endl;
                 std::chrono::high_resolution_clock::time_point t1 =
                     std::chrono::high_resolution_clock::now();
 
@@ -43,13 +42,11 @@ namespace control_callbacks {
 
 
                 if (!global_handler->running) {
-                    std::cout << "Motion finished" << std::endl;
                     franka::JointVelocities zero_velocities{{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
                     return franka::MotionFinished(zero_velocities);
                 }
 
                 if (global_handler->time == 0.0) {
-                std::cout << "(global_handler->time == 0.0" << std::endl;
                 global_handler->traj_interpolator_ptr->Reset(
                     global_handler->time, current_state_info->joint_positions,
                     goal_state_info->joint_positions, policy_rate, traj_rate,
@@ -64,7 +61,6 @@ namespace control_callbacks {
                 state_publisher->UpdateNewState(robot_state, &model);
 
                 std::array<double, 7> joint_velocities;
-                std::cout << "joint_velocities, entering step" << std::endl;
                 joint_velocities =
                     global_handler->controller_ptr->Step(robot_state, desired_q);
                 

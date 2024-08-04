@@ -107,10 +107,10 @@ JointVelocityController::Step(const franka::RobotState &robot_state,
 
   Eigen::Matrix<double, 7, 1> desired_qv = desired_q - current_q;
 
-  double kv = 2.0
-  desired_qv *=kv
+  double kv = 2.0;
+  desired_qv *=kv;
 
-  std:: cout << "desired_qv\n" << desired_qv.transpose() << std::endl;
+  std:: cout << "desired_qv\n" << desired_qv << std::endl;
   
   for (int i = 0; i < 7; i++) {
     if (desired_qv[i] < velocity_min_[i]){
@@ -121,7 +121,7 @@ JointVelocityController::Step(const franka::RobotState &robot_state,
       desired_qv[i] = velocity_max_[i];
     }
   }
-  std:: cout << "v max desired_qv\n" << desired_qv.transpose() << std::endl;
+  std:: cout << "v max desired_qv\n" << desired_qv << std::endl;
 
 
   Eigen::Matrix<double, 7, 1> dist2joint_max;
@@ -137,7 +137,7 @@ JointVelocityController::Step(const franka::RobotState &robot_state,
       desired_qv[i] = 0.0;
   }
 
-  std:: cout << "d max desired_qv\n" << desired_qv.transpose() << std::endl;
+  std:: cout << "d max desired_qv\n" << desired_qv << std::endl;
 
 
   std::array<double, 7> qv_d_array{};
