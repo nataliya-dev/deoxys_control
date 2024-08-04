@@ -34,11 +34,7 @@ JointVelocityController::JointVelocityController(franka::Model &model) {
 }
 
 bool JointVelocityController::ParseMessage(const FrankaControlMessage &msg) {
-    std::cout << "Parse msg" << std::endl;
-
-
   if (!msg.control_msg().UnpackTo(&control_msg_)) {
-    std::cout << "!msg.control_msg().UnpackTo(&control_msg_)" << std::endl;
     return false;
   }
 
@@ -100,7 +96,6 @@ JointVelocityController::Step(const franka::RobotState &robot_state,
 
   std::chrono::high_resolution_clock::time_point t1 =
       std::chrono::high_resolution_clock::now();
-  std::cout << "STEP" << std::endl;
 
   Eigen::Matrix<double, 7, 1> current_q, current_dq;
 
@@ -112,7 +107,10 @@ JointVelocityController::Step(const franka::RobotState &robot_state,
 
   Eigen::Matrix<double, 7, 1> desired_qv = desired_q - current_q;
 
-  std:: cout << "desired_qv\n" << desired_qv << std::endl;
+  double kv = 2.0
+  desired_qv *=kv
+
+  std:: cout << "desired_qv\n" << desired_qv.transpose() << std::endl;
   
   for (int i = 0; i < 7; i++) {
     if (desired_qv[i] < velocity_min_[i]){
@@ -123,7 +121,7 @@ JointVelocityController::Step(const franka::RobotState &robot_state,
       desired_qv[i] = velocity_max_[i];
     }
   }
-  std:: cout << "v max desired_qv\n" << desired_qv << std::endl;
+  std:: cout << "v max desired_qv\n" << desired_qv.transpose() << std::endl;
 
 
   Eigen::Matrix<double, 7, 1> dist2joint_max;
@@ -139,7 +137,7 @@ JointVelocityController::Step(const franka::RobotState &robot_state,
       desired_qv[i] = 0.0;
   }
 
-  std:: cout << "d max desired_qv\n" << desired_qv << std::endl;
+  std:: cout << "d max desired_qv\n" << desired_qv.transpose() << std::endl;
 
 
   std::array<double, 7> qv_d_array{};

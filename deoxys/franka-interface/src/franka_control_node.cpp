@@ -501,15 +501,10 @@ int main(int argc, char **argv) {
             traj_interpolator_type = control_command.traj_interpolator_type;
           }
 
-          std::cout << "ParseMessage(control_msg);" << std::endl;
-
           global_handler->controller_ptr->ParseMessage(control_msg);
-
-
-          std::cout << "ComputeGoal" << std::endl;
-
           global_handler->controller_ptr->ComputeGoal(current_state_info,
                                                       goal_state_info);
+                                                      
           switch (control_command.traj_interpolator_type) {
           case TrajInterpolatorType::LINEAR_POSE:
           case TrajInterpolatorType::LINEAR_POSITION:
